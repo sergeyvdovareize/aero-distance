@@ -25,7 +25,9 @@ const cache = {}
 
 exports.getData = async (orig, dest) => {
     if (!fs.existsSync(DATA_FILE)) {
+        console.log('no aero data file: ', DATA_FILE)
         await this.refreshAeroData()
+        console.log('updated aero data file')
     }
 
     return new Promise((resolve, reject) => {
@@ -65,7 +67,10 @@ exports.getData = async (orig, dest) => {
                 }
 
                 reject(message)
-            });
+            })
+            .on('error', (error) => {
+                reject(error)
+            })
     })
 }
 
