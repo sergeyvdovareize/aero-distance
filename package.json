@@ -1,0 +1,23 @@
+{
+  "name": "aero-distance",
+  "description": "Calculates the distance between 2 airports",
+  "version": "0.1.0",
+  "main": "server.js",
+  "engines": {
+    "node": "13.5.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "start:dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "csv-parser": "^2.3.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
