@@ -3,8 +3,8 @@ const fs = require('fs')
 const path = require('path')
 const csv = require('csv-parser')
 
-// const DATA_FILE = path.resolve(__dirname, `data/${process.env.AERO_OPEN_DATA_FILE}`)
-const DATA_FILE = `./app/data/${process.env.AERO_OPEN_DATA_FILE}`
+const DATA_DIR = path.resolve(__dirname, 'data')
+const DATA_FILE = `${DATA_DIR}/${process.env.AERO_OPEN_DATA_FILE}`
 const CSV_HEADERS = [
     'id',
     'name',
@@ -26,9 +26,7 @@ const cache = {}
 
 exports.getData = async (orig, dest) => {
     if (!fs.existsSync(DATA_FILE)) {
-        console.log('no aero data file: ', DATA_FILE)
         await this.refreshAeroData()
-        console.log('updated aero data file')
     }
 
     return new Promise((resolve, reject) => {
@@ -74,6 +72,10 @@ exports.getData = async (orig, dest) => {
 }
 
 exports.refreshAeroData = () => {
+    if (!fs.existsSync(DATA_DIR)){
+        fs.mkdirSync(DATA_DIR);
+    }
+
     return fetch(process.env.AERO_OPEN_DATA_URI)
         .then(res => {
             const stream = fs.createWriteStream(DATA_FILE);
