@@ -3,7 +3,8 @@ const fs = require('fs')
 const path = require('path')
 const csv = require('csv-parser')
 
-const DATA_FILE = path.resolve(__dirname, `data/${process.env.AERO_OPEN_DATA_FILE}`)
+// const DATA_FILE = path.resolve(__dirname, `data/${process.env.AERO_OPEN_DATA_FILE}`)
+const DATA_FILE = `./app/data/${process.env.AERO_OPEN_DATA_FILE}`
 const CSV_HEADERS = [
     'id',
     'name',
@@ -68,9 +69,7 @@ exports.getData = async (orig, dest) => {
 
                 reject(message)
             })
-            .on('error', (error) => {
-                reject(error)
-            })
+            
     })
 }
 
