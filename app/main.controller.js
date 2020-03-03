@@ -6,32 +6,28 @@ exports.index = (req, res) => {
 }
 
 exports.distance = async ({ query: {orig, dest} }, res) => {
-    aeroDataProcessor.getData(orig, dest)
-        .then(({ origData, destData }) => {
-            const unit = 'km'
-            const distance = Math.round(calculator.calc(origData.lat, origData.long, destData.lat, destData.long, unit))
-            const result = {
-                originPoint: {
-                    airport: origData.iata,
-                    name: origData.name,
-                    city: origData.city,
-                    country: origData.country
-                },
-                destinationPoint: {
-                    airport: destData.iata,
-                    name: destData.name,
-                    city: destData.city,
-                    country: destData.country
-                },
-                distance,
-                unit
-            }
+    try {
+        const unit = 'km'
+        const { origData, destData } = await aeroDataProcessor.getData(orig, dest)
+        
+        const url = prepareDistanceUrl(origData, destData)
+        console.log('aws url - ', url)
+        
+        let distance = await fetch(url)
+        console.log(distance)
+        
+        distance = Math.round(distance)
+        const result = {
+            originPoint: preparePointResponse(origData),
+            destinationPoint: preparePointResponse(destData),
+            distance,
+            unit
+        }
 
-            res.send(result)
-        })
-        .catch(error => {
-            res.status(404).send(error)
-        })
+        res.send(result)
+    } catch(error) {
+        res.status(404).send(error)
+    }
 }
 
 exports.preferredFlight = async ({ query }, res) => {
@@ -48,6 +44,26 @@ exports.preferredFlight = async ({ query }, res) => {
     const filteredSchedule = await schedule.filter(flight => flightFilter(flight, criteria))
     // const filteredSchedule = schedule.map(flight => flightFilter(flight, criteria))
     res.send(filteredSchedule)
+}
+
+function prepareDistanceUrl(origData, destData) {
+    const params = {
+        lat1: origData.lat,
+        lat2: destData.lat,
+        lon1: origData.long,
+        lon2: destData.long,
+    }
+    const queryParams = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+    return `${process.env.AERO_DISTANCE_LAMBDA_FUNCTION_URL}?${queryParams}`
+}
+
+function preparePointResponse(pointData) {
+    return {
+        airport: pointData.iata,
+        name: pointData.name,
+        city: pointData.city,
+        country: pointData.country
+    }
 }
 
 function flightFilter(flight, criteria) {
