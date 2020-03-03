@@ -29,6 +29,7 @@ exports.distance = async ({ query: {orig, dest} }, res) => {
     }
 }
 
+// @deprecated
 exports.preferredFlight = async ({ query }, res) => {
     const criteria = {
         carriers: query.carriers.split(',').map(carrier => carrier.toUpperCase()),
@@ -45,6 +46,7 @@ exports.preferredFlight = async ({ query }, res) => {
     res.send(filteredSchedule)
 }
 
+// @deprecated
 function prepareDistanceUrl(origData, destData) {
     const params = {
         lat1: origData.lat,
@@ -56,6 +58,7 @@ function prepareDistanceUrl(origData, destData) {
     return `${process.env.AERO_DISTANCE_LAMBDA_FUNCTION_URL}?${queryParams}`
 }
 
+// @deprecated
 function preparePointResponse(pointData) {
     return {
         airport: pointData.iata,
@@ -65,6 +68,7 @@ function preparePointResponse(pointData) {
     }
 }
 
+// @deprecated
 function flightFilter(flight, criteria) {
     const departureTime = new Date(flight.departureTime)
     const arrivalTime = new Date(flight.arrivalTime)
