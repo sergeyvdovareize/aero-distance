@@ -1,4 +1,4 @@
-const calculator = require('./calculator')
+const fetch = require('node-fetch')
 const aeroDataProcessor = require('./aero-data-processor')
 
 exports.index = (req, res) => {
@@ -11,12 +11,10 @@ exports.distance = async ({ query: {orig, dest} }, res) => {
         const { origData, destData } = await aeroDataProcessor.getData(orig, dest)
         
         const url = prepareDistanceUrl(origData, destData)
-        console.log('aws url - ', url)
         
-        let distance = await fetch(url)
-        console.log(distance)
+        let distanceResponse = await fetch(url)
+        const distance = Math.round(await distanceResponse.json())
         
-        distance = Math.round(distance)
         const result = {
             originPoint: preparePointResponse(origData),
             destinationPoint: preparePointResponse(destData),
@@ -26,6 +24,7 @@ exports.distance = async ({ query: {orig, dest} }, res) => {
 
         res.send(result)
     } catch(error) {
+        console.log(error)
         res.status(404).send(error)
     }
 }
